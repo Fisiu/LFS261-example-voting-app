@@ -10,7 +10,12 @@ pipeline {
             when {
                 anyOf {
                     changeRequest()
-                    changeset 'result/**'
+                    changeset '**/result/**'
+                }
+            }
+            agent {
+                docker {
+                    image "node:lts-alpine"
                 }
             }
             agent {
@@ -30,7 +35,12 @@ pipeline {
             when {
                 anyOf {
                     changeRequest()
-                    changeset 'result/**'
+                    changeset '**/result/**'
+                }
+            }
+            agent {
+                docker {
+                    image "node:lts-alpine"
                 }
             }
             agent {
