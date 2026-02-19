@@ -1,8 +1,8 @@
 pipeline {
     agent any
 
-    tools {
-        nodejs 'node-lts'
+    environment {
+        DOCKER_HUB_USER = credentials('docker-hub-login')
     }
 
     stages {
@@ -11,6 +11,11 @@ pipeline {
                 anyOf {
                     changeRequest()
                     changeset 'result/**'
+                }
+            }
+            agent {
+                docker {
+                    image "node:lts-alpine"
                 }
             }
             steps {
@@ -28,11 +33,26 @@ pipeline {
                     changeset 'result/**'
                 }
             }
+            agent {
+                docker {
+                    image "node:lts-alpine"
+                }
+            }
             steps {
                 echo 'Running tests'
                 dir('result') {
                     sh 'npm test'
                 }
+            }
+        }
+        stage("docker-package") {
+            when {
+                branch 'master'
+                changeset "**/result/**"
+            }
+            agent any
+            steps {
+                echo 'Building Docker image'
             }
         }
     }
