@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent none
     environment {
         DOCKER_HUB_USER = credentials('docker-hub-login')
     }
@@ -14,7 +14,7 @@ pipeline {
             agent {
                 docker {
                     image "maven:3-sapmachine-21"
-                    args "-v $HOME/.m2:/root/.m2"
+                    args '-v $HOME/.m2:/root/.m2'
                 }
             }
             steps {
@@ -34,7 +34,7 @@ pipeline {
             agent {
                 docker {
                     image "maven:3-sapmachine-21"
-                    args "-v $HOME/.m2:/root/.m2"
+                    args '-v $HOME/.m2:/root/.m2'
                 }
             }
             steps {
@@ -52,7 +52,7 @@ pipeline {
             agent {
                 docker {
                     image "maven:3-sapmachine-21"
-                    args "-v $HOME/.m2:/root/.m2"
+                    args '-v $HOME/.m2:/root/.m2'
                 }
             }
             steps {
