@@ -1,0 +1,68 @@
+---
+volumes:
+  db-data:
+
+networks:
+  instavote:
+    driver: bridge
+
+services:
+  vote:
+    image: fisiu82/vote:latest
+    build: ./vote
+    container_name: vote
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    depends_on:
+      - redis
+    networks:
+      - instavote
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: unless-stopped
+    networks:
+      - instavote
+
+  db:
+    image: postgres:15-alpine
+    container_name: db
+    restart: unless-stopped
+    networks:
+      - instavote
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  result:
+    image: fisiu82/result:latest
+    build: ./result
+    container_name: result
+    restart: unless-stopped
+    ports:
+      - "5001:80"
+    depends_on:
+      - db
+    networks:
+      - instavote
+
+  worker:
+    image: fisiu82/worker:latest
+    build: ./worker
+    container_name: worker
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - db
+    networks:
+      - instavote
