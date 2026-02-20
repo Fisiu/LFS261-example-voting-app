@@ -17,8 +17,9 @@ WORKDIR /app
 RUN apk add --no-cache curl tini
 
 COPY --from=builder /app/package*.json .
-COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/server.js .
+COPY --from=builder /app/views ./views
+COPY --from=builder /app/node_modules ./node_modules
 
 USER node
 ENV PORT=80
