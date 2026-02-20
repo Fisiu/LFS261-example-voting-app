@@ -30,8 +30,12 @@ RUN apt-get update && apt-get install -y tini curl && rm -rf /var/lib/apt/lists/
 COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
+RUN useradd -m flask
+
 # Copy application code
-COPY . .
+COPY --chown=flask:flask . .
+RUN chown -R flask:flask /app
+USER flask
 
 # Set default Environment Variables
 ENV FLASK_APP=app.py
@@ -39,8 +43,5 @@ ENV FLASK_RUN_HOST=0.0.0.0
 ENV PORT=5000
 EXPOSE 5000
 
-RUN useradd -m flask
-USER flask
-
 ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["sh", "-c", "gunicorn", "--bind", "0.0.0.0:$PORT", "app:app"]
+CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:$PORT --worker-tmp-dir /dev/shm --workers 2 --access-logfile - --error-logfile - app:app"]
