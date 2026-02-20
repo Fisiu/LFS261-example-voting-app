@@ -1,67 +1,93 @@
-pipeline { 
+pipeline {
     agent none
-    stages{ 
-        stage('build'){ 
-            agent{
-                docker{
-                    image 'python:3.11-slim'
-                    args '--user root'
-                    }
-                    }
 
-            steps{ 
-                echo 'Compiling vote app.' 
-                dir('vote'){
-            
-                        sh "pip install -r requirements.txt"
-
-                } 
-            } 
-        } 
-        stage('test'){ 
-           
-            agent {
-                docker{
-                    image 'python:3.11-slim'
-                    args '--user root'
-                    }
-                    }
-            steps{ 
-                echo 'Running Unit Tests on vote app.' 
-                dir('vote'){ 
-                   
-                        sh "pip install -r requirements.txt"
-                        sh 'nosetests -v'
-                        
-                        
-                } 
-            } 
-        } 
-
-      stage('docker-package'){
-          agent any
-         
-          steps{
-            echo 'Packaging wvoteorker app with docker'
-            script{
-              docker.withRegistry('https://index.docker.io/v1/', 'dockerlogin') {
-                  // ./vote is the path to the Dockerfile that Jenkins will find from the Github repo
-                  def voteImage = docker.build("xxxx/vote:v${env.BUILD_ID}", "./vote")
-                  voteImage.push()
-                  voteImage.push("${env.BRANCH_NAME}")
-                  voteImage.push("latest")
-              }
-            }
-          }
-      }
-
-    } 
-    post {
-        always{
-            echo 'Pipeline for vote is complete'
-        }
+    environment {
+        DOCKER_HUB_USER = credentials('docker-hub-login')
     }
 
-} 
+    stages {
+        stage('build') {
+            when {
+                anyOf {
+                    changeRequest()
+                    changeset '**/vote/**'
+                }
+            }
 
+            agent {
+                docker {
+                    image 'python:3.11-slim'
+                    args '--user root'
+                }
+            }
 
+            steps {
+                echo 'Compiling vote app.'
+                dir('vote') {
+                        sh 'pip install -r requirements.txt'
+                }
+            }
+        }
+        stage('test') {
+            when {
+                anyOf {
+                    changeRequest()
+                    changeset '**/vote/**'
+                }
+            }
+
+            agent {
+                docker {
+                    image 'python:3.11-slim'
+                    args '--user root'
+                }
+            }
+            steps {
+                echo 'Running Unit Tests on vote app.'
+                dir('vote') {
+                        sh 'pip install -r requirements.txt'
+                        sh 'nosetests -v'
+                }
+            }
+        }
+
+        stage('docker-package') {
+            when {
+                allOf {
+                    branch 'master'
+                    changeset '**/vote/**'
+                }
+            }
+
+            agent any
+
+            steps {
+                echo 'Building Docker image'
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credentials') {
+                        def image = docker.build("${DOCKER_HUB_USER}/vote:v${env.BUILD_ID}", './vote')
+
+                        try {
+                            image.push()
+                            image.push('latest')
+                        } finally {
+                            sh "docker rmi ${DOCKER_HUB_USER}/vote:v${env.BUILD_ID}"
+                            sh "docker rmi ${DOCKER_HUB_USER}/vote:latest"
+                        }
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            echo 'Pipeline for vote is complete'
+        }
+        failure {
+            slackSend(channel: '#ci-cd', message: "Build Failed: ${env.JOB_NAME} ${env.BUILD_NUMBER}")
+        }
+        success {
+            slackSend(channel: '#ci-cd', message: "Build Success: ${env.JOB_NAME} ${env.BUILD_NUMBER}")
+        }
+    }
+}
