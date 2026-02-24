@@ -14,7 +14,7 @@ class Worker {
       JedisPoolConfig poolConfig = new JedisPoolConfig();
       JedisPool jedisPool = connectToRedis("redis", poolConfig);
       Connection dbConn = connectToDB("db");
-      
+
       createVotesTable(dbConn);
 
       System.err.println("Watching vote queue");
@@ -52,10 +52,10 @@ class Worker {
   static void updateVote(Connection dbConn, String voterID, String vote) throws SQLException {
     String checkSQL = "SELECT vote FROM votes WHERE id = ?";
     String upsertSQL = "INSERT INTO votes (id, vote) VALUES (?, ?) ON CONFLICT (id) DO UPDATE SET vote = EXCLUDED.vote";
-    
+
     try (PreparedStatement checkStmt = dbConn.prepareStatement(checkSQL);
          PreparedStatement upsertStmt = dbConn.prepareStatement(upsertSQL)) {
-      
+
       checkStmt.setString(1, voterID);
       try (ResultSet rs = checkStmt.executeQuery()) {
         if (rs.next()) {
@@ -69,7 +69,7 @@ class Worker {
           System.err.printf("New vote from voter %s for %s\n", voterID, vote);
         }
       }
-      
+
       upsertStmt.setString(1, voterID);
       upsertStmt.setString(2, vote);
       int affectedRows = upsertStmt.executeUpdate();
@@ -121,6 +121,27 @@ class Worker {
       Thread.sleep(duration);
     } catch (InterruptedException e) {
       System.exit(1);
+    }
+  }
+static class FizzBuzz {
+    public static void generate(int limit) {
+      for (int i = 1; i <= limit; i++) {
+        if (i % 3 == 0 && i % 5 == 0) {
+          System.out.println("FizzBuzz");
+        } else if (i % 3 == 0) {
+          System.out.println("Fizz");
+        } else if (i % 5 == 0) {
+          System.out.println("Buzz");
+        } else {
+          System.out.println(i);
+        }
+      }
+    }
+
+    // Example of how it could be called, not part of the main application flow
+    public static void main(String[] args) {
+        System.out.println("FizzBuzz demonstration:");
+        generate(20); // Generate FizzBuzz up to 20
     }
   }
 }
