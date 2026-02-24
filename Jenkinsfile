@@ -220,6 +220,42 @@ pipeline {
             }
         }
 
+        // sonarqube analysis
+        stage('Sonarqube') {
+            when {
+                branch 'master'
+            }
+
+            agent any
+
+            environment {
+                sonarpath = tool 'SonarScanner'
+            }
+
+            steps {
+                echo 'Running sonarqube analysis'
+                withSonarQubeEnv('sonar-instavote') {
+                    sh "${sonarpath}/bin/sonar-scanner -Dproject.settings=sonar-project.properties -Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=86400"
+                }
+            }
+        }
+
+        stage("QualityGate") {
+            when {
+                branch 'master'
+            }
+
+            agent any
+
+            steps {
+                timeout(time:1,unit:'HOURS') {
+                    //Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
+                    // true = set pipeline to UNSTABLE, false = don't
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
         // deploy to dev
         stage('deploy to dev') {
             agent any
