@@ -1,5 +1,4 @@
 services:
-
   e2e:
     build: ./tests/
     depends_on:
@@ -13,7 +12,9 @@ services:
 
   vote:
     image: ${VOTE_IMAGE}
-    ports: ["80"]
+    ports: ["80:80"]
+    environment:
+      - PORT=80
     depends_on:
       - redis
       - db
