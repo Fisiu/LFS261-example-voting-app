@@ -7,10 +7,6 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# RUN apt-get update && apt-get install -y --no-cache \
-#     build-essential curl \
-#     && rm -rf /var/lib/apt/lists/*
-
 # Use a virtual environment to make copying to the next stage easier
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
