@@ -192,6 +192,23 @@ pipeline {
                 }
             }
         }
+        stage('[vote] integration') {
+            when {
+                allOf {
+                    branch 'master'
+                    changeset '**/vote/**'
+                }
+            }
+
+            agent any
+
+            steps {
+                echo'Running Integration Tests'
+                dir('vote') {
+                        sh 'sh integration_test.sh'
+                }
+            }
+        }
         stage('[vote] docker-package') {
             when {
                 allOf {
