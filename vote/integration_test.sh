@@ -7,6 +7,13 @@ echo "I: Creating environment to run  integration tests..."
 docker-compose build
 docker-compose up -d
 
+echo "Waiting for vote app to be ready..."
+if ! timeout 60 bash -c 'until curl -s http://localhost:80 > /dev/null 2>&1; do sleep 2; done'; then
+  echo "Vote app not ready, aborting"
+  docker-compose down
+  cd ..
+  exit 1
+fi
 
 echo "I: Launching Integration Test ..."
 
