@@ -251,8 +251,10 @@ pipeline {
 
             steps {
                 echo 'Running sonarqube analysis'
-                withSonarQubeEnv('sonar-instavote') {
-                    sh "${sonarpath}/bin/sonar-scanner -Dproject.settings=sonar-project.properties -Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=86400"
+                dir("worker") {
+                    withSonarQubeEnv('sonar-instavote') {
+                        sh "mvn sonar:sonar -Dsonar.projectBaseDir=.."
+                    }
                 }
             }
         }
