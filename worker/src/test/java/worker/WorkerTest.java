@@ -1,12 +1,11 @@
 package worker;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import worker.Worker;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class WorkerTest {
 
@@ -32,7 +31,10 @@ class WorkerTest {
 
         // Test with limit = 15
         Worker.FizzBuzz.generate(15);
-        Assertions.assertEquals("1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz\n", outContent.toString());
+        Assertions.assertEquals(
+            "1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz\n",
+            outContent.toString()
+        );
         outContent.reset();
 
         // Test with limit = 0
@@ -47,68 +49,47 @@ class WorkerTest {
     }
 
     @Test
-    void sample1() {
-
-    }
-
+    void sample1() {}
 
     @Test
-    void sample2() {
-
-    }
+    void sample2() {}
 
     @Test
-    void sample3() {
-
-    }
+    void sample3() {}
 
     @Test
-    void sample4() {
+    void sample4() {}
 
-    }
-   @Test
-    void sample5() {
-
-    }
     @Test
-    void sample6() {
+    void sample5() {}
 
-    }
     @Test
-    void sample7() {
+    void sample6() {}
 
-    }
     @Test
-    void sample8() {
+    void sample7() {}
 
-    }
     @Test
-    void sample9() {
+    void sample8() {}
 
-    }
     @Test
-    void sample10() {
+    void sample9() {}
 
-    }
     @Test
-    void sample16() {
+    void sample10() {}
 
-    }
-     @Test
-    void sample17() {
+    @Test
+    void sample16() {}
 
-    }
+    @Test
+    void sample17() {}
 
- @Test
-    void sample18() {
+    @Test
+    void sample18() {}
 
-    }
- @Test
-    void sample19() {
+    @Test
+    void sample19() {}
 
-    }
-  @Test
-    void sample20() {
-
-    }
+    @Test
+    void sample20() {}
 }
