@@ -8,7 +8,7 @@ import worker.Worker;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-class UnitWorker {
+class WorkerTest {
 
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
